@@ -42,7 +42,13 @@ jobs:
           LINKEDIN_CLIENT_ID="$(printf '%s' "$LINKEDIN_CLIENT_ID" | tr -d '[:space:]')"
           test -n "$LINKEDIN_CLIENT_ID" || { echo "LINKEDIN_CLIENT_ID secret is missing"; exit 1; }
           # Only letters and digits are allowed, so nothing odd can be injected into the page.
-          [[ "$LINKEDIN_CLIENT_ID" =~ ^[A-Za-z0-9]+$ ]] || { echo "LINKEDIN_CLIENT_ID has unexpected characters"; exit 1; }
+          if ! [[ "$LINKEDIN_CLIENT_ID" =~ ^[A-Za-z0-9]+$ ]]; then
+            echo "LINKEDIN_CLIENT_ID has unexpected characters"
+            echo "Length: ${#LINKEDIN_CLIENT_ID}"
+            # Show only the offending characters, as hex, never the whole value.
+            echo "Offending characters (hex): $(printf '%s' "$LINKEDIN_CLIENT_ID" | tr -d 'A-Za-z0-9' | od -An -tx1 | head -c 200)"
+            exit 1
+          fi
           mkdir -p _site
           cp callback.html callback.js index.html style.css _site/
           sed "s|__LINKEDIN_CLIENT_ID__|${LINKEDIN_CLIENT_ID}|g" index.js > _site/index.js
