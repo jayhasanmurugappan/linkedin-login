@@ -1,0 +1,5 @@
+body { font-family: system-ui, sans-serif; max-width: 34rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
+a.btn, button { display: inline-block; padding: .7rem 1.2rem; background: #0a66c2; color: #fff; border: 0; border-radius: 6px; text-decoration: none; font-size: 1rem; cursor: pointer; }
+pre { background: #f3f3f3; padding: .8rem; border-radius: 6px; white-space: pre-wrap; word-break: break-all; }
+small { color: #555; }
+.err { color: #b00020; }

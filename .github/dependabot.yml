@@ -1,0 +1,7 @@
+version: 2
+updates:
+  # Opens a pull request when a pinned action has a newer release, so pins never go stale.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

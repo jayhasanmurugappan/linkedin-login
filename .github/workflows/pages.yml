@@ -1,0 +1,53 @@
+name: Deploy login pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["index.html", "index.js", "callback.html", "callback.js", "style.css", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+# No permissions by default; each job asks for only what it needs.
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Actions are pinned to full commit SHAs, not tags, so a hijacked tag cannot swap in malicious code.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Build site with client ID injected
+        env:
+          LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$LINKEDIN_CLIENT_ID" || { echo "LINKEDIN_CLIENT_ID secret is missing"; exit 1; }
+          # Only letters and digits are allowed, so nothing odd can be injected into the page.
+          [[ "$LINKEDIN_CLIENT_ID" =~ ^[A-Za-z0-9]+$ ]] || { echo "LINKEDIN_CLIENT_ID has unexpected characters"; exit 1; }
+          mkdir -p _site
+          cp callback.html callback.js index.html style.css _site/
+          sed "s|__LINKEDIN_CLIENT_ID__|${LINKEDIN_CLIENT_ID}|g" index.js > _site/index.js
+
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
