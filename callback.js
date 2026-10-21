@@ -27,8 +27,9 @@ if (errorText) {
   var runUrl = "https://github.com/" + encodeURIComponent(owner) +
     "/linkedin-connector/actions/workflows/exchange-token.yml";
   out.innerHTML =
-    "<p>Login worked. Copy this one-time code, then paste it into the <b>Exchange token</b> workflow.</p>" +
+    "<p>Login worked. On your phone, tap <b>Open in the LinkedIn Assist app</b> to finish connecting. Or copy this one-time code and paste it into the <b>Exchange token</b> workflow.</p>" +
     '<pre id="code">' + esc(code) + "</pre>" +
+    '<p><a class="btn" href="linkedinassist://connect?code=' + encodeURIComponent(code) + '">Open in the LinkedIn Assist app</a></p>' +
     '<p><button id="copy">Copy code</button> <a class="btn" href="' + esc(runUrl) + '">Open the workflow</a></p>' +
     "<p><small>The code is single-use and expires in a few minutes.</small></p>";
   document.getElementById("copy").onclick = function () {
